@@ -157,6 +157,7 @@ class _CropEditor extends StatefulWidget {
   final CropController? controller;
   final ValueChanged<Rect>? onMoved;
   final ValueChanged<CropStatus>? onStatusChanged;
+  final ValueChanged<bool>? loaded;
   final Color? maskColor;
   final Color baseColor;
   final double radius;
@@ -177,6 +178,7 @@ class _CropEditor extends StatefulWidget {
     this.controller,
     this.onMoved,
     this.onStatusChanged,
+    this.loaded,
     this.maskColor,
     required this.baseColor,
     required this.radius,
@@ -447,6 +449,9 @@ class _CropEditorState extends State<_CropEditor> {
   @override
   Widget build(BuildContext context) {
     print("_isImageLoading: $_isImageLoading");
+    if (_isImageLoading == false) {
+      widget.loaded.call(true);
+    }
     return _isImageLoading
         ? Center(child: widget.progressIndicator)
         : Stack(
