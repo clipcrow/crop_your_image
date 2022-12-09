@@ -451,9 +451,8 @@ class _CropEditorState extends State<_CropEditor> {
 
   @override
   Widget build(BuildContext context) {
-    print("_isImageLoading: $_isImageLoading");
     if (_isImageLoading == false) {
-      widget.loaded?.call(!_isImageLoading);
+      widget.loaded?.call(true);
     }
     return _isImageLoading
         ? Center(child: widget.progressIndicator)
