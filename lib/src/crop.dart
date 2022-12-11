@@ -60,7 +60,7 @@ class Crop extends StatelessWidget {
   /// note: Currently, the very first callback is [CropStatus.ready]
   /// which is called after loading [image] data for the first time.
   final ValueChanged<CropStatus>? onStatusChanged;
-  final ValueChanged<bool>? loaded;
+  final ValueChanged<bool>? imgLoadedCallBack;
 
   /// [Color] of the mask widget which is placed over the cropping editor.
   final Color? maskColor;
@@ -102,7 +102,7 @@ class Crop extends StatelessWidget {
     this.controller,
     this.onMoved,
     this.onStatusChanged,
-    this.loaded,
+    this.imgLoadedCallBack,
     this.maskColor,
     this.baseColor = Colors.white,
     this.radius = 0,
@@ -134,7 +134,7 @@ class Crop extends StatelessWidget {
             controller: controller,
             onMoved: onMoved,
             onStatusChanged: onStatusChanged,
-            loaded: loaded,
+            imgLoadedCallBack: imgLoadedCallBack,
             maskColor: maskColor,
             baseColor: baseColor,
             radius: radius,
@@ -160,7 +160,7 @@ class _CropEditor extends StatefulWidget {
   final CropController? controller;
   final ValueChanged<Rect>? onMoved;
   final ValueChanged<CropStatus>? onStatusChanged;
-  final ValueChanged<bool>? loaded;
+  final ValueChanged<bool>? imgLoadedCallBack;
   final Color? maskColor;
   final Color baseColor;
   final double radius;
@@ -181,7 +181,7 @@ class _CropEditor extends StatefulWidget {
     this.controller,
     this.onMoved,
     this.onStatusChanged,
-    this.loaded,
+    this.imgLoadedCallBack,
     this.maskColor,
     required this.baseColor,
     required this.radius,
@@ -451,6 +451,9 @@ class _CropEditorState extends State<_CropEditor> {
 
   @override
   Widget build(BuildContext context) {
+    if (_isImageLoading == false) {
+      widget.imgLoadedCallBack?.call(true);
+    }
     return _isImageLoading
         ? Center(child: widget.progressIndicator)
         : Stack(
