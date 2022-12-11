@@ -451,9 +451,6 @@ class _CropEditorState extends State<_CropEditor> {
 
   @override
   Widget build(BuildContext context) {
-    if (_isImageLoading == false) {
-      widget.loaded?.call(true);
-    }
     return _isImageLoading
         ? Center(child: widget.progressIndicator)
         : Stack(
