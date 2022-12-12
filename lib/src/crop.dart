@@ -206,7 +206,7 @@ class _CropEditorState extends State<_CropEditor> {
   bool _isFitVertically = false;
   Future<image.Image?>? _lastComputed;
 
-  bool get _isImageLoading => _lastComputed != null;
+  bool get _isImageLoading => _lastComputed != null && _targetImage != null;
 
   _Calculator get calculator => _isFitVertically
       ? const _VerticalCalculator()
