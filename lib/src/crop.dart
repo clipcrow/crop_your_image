@@ -198,7 +198,7 @@ class _CropEditor extends StatefulWidget {
 class _CropEditorState extends State<_CropEditor> {
   late CropController _cropController;
   late Rect _rect;
-  image.Image? _targetImage;
+  image.Image? _targetImage = null;
   late Rect _imageRect;
 
   double? _aspectRatio;
