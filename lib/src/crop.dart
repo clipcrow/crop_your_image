@@ -339,12 +339,12 @@ class _CropEditorState extends State<_CropEditor> {
     _lastComputed = future;
     future.then((converted) {
       if (_lastComputed == future) {
+        _targetImage = converted;
         _withCircleUi = widget.withCircleUi;
         _resetCroppingArea();
 
         setState(() {
           _lastComputed = null;
-        _targetImage = converted;
         });
         widget.onStatusChanged?.call(CropStatus.ready);
       }
