@@ -198,7 +198,7 @@ class _CropEditor extends StatefulWidget {
 class _CropEditorState extends State<_CropEditor> {
   late CropController _cropController;
   late Rect _rect;
-  image.Image? _targetImage = null;
+  image.Image? _targetImage;
   late Rect _imageRect;
 
   double? _aspectRatio;
@@ -206,7 +206,7 @@ class _CropEditorState extends State<_CropEditor> {
   bool _isFitVertically = false;
   Future<image.Image?>? _lastComputed;
 
-  bool get _isImageLoading => _lastComputed != null && _targetImage != null;
+  bool get _isImageLoading => _lastComputed != null;
 
   _Calculator get calculator => _isFitVertically
       ? const _VerticalCalculator()
@@ -339,12 +339,12 @@ class _CropEditorState extends State<_CropEditor> {
     _lastComputed = future;
     future.then((converted) {
       if (_lastComputed == future) {
-        _targetImage = converted;
         _withCircleUi = widget.withCircleUi;
         _resetCroppingArea();
 
         setState(() {
           _lastComputed = null;
+        _targetImage = converted;
         });
         widget.onStatusChanged?.call(CropStatus.ready);
       }
@@ -451,10 +451,10 @@ class _CropEditorState extends State<_CropEditor> {
 
   @override
   Widget build(BuildContext context) {
-    if (_isImageLoading == false) {
+    if (_isImageLoading == false && _targetImage != null) {
       widget.imgLoadedCallBack?.call(true);
     }
-    return _isImageLoading
+    return _isImageLoading || _targetImage == null
         ? Center(child: widget.progressIndicator)
         : Stack(
             children: [
