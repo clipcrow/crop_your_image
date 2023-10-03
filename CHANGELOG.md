@@ -1,3 +1,9 @@
+## [0.7.5] - 2023.6.5
+* Update Fluter version to 3.10.3
+
+## [0.7.4] - 2023.1.10
+* Update versions of depencencies.
+
 ## [0.7.3] - 2022.11.15
 * Add `progressIndicator` parameter to pass a Widget indicating progress.
 * Updated versions of dependencies.
