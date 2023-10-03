@@ -703,10 +703,10 @@ Uint8List _doCrop(List<dynamic> cropData) {
     image.encodePng(
       image.copyCrop(
         originalImage,
-        rect.left.toInt(),
-        rect.top.toInt(),
-        rect.width.toInt(),
-        rect.height.toInt(),
+        x: rect.left.toInt(),
+        y: rect.top.toInt(),
+        width: rect.width.toInt(),
+        height: rect.height.toInt(),
       ),
     ),
   );
@@ -725,8 +725,8 @@ Uint8List _doCropCircle(List<dynamic> cropData) {
     image.encodePng(
       image.copyCropCircle(
         originalImage,
-        center: center,
-        // centerY: center.yi,
+        centerX: center.xi,
+        centerY: center.yi,
         radius: min(rect.width, rect.height) ~/ 2,
       ),
     ),
@@ -739,13 +739,13 @@ image.Image _fromByteData(Uint8List data) {
   assert(tempImage != null);
 
   // check orientation
-  switch (tempImage?.exif.orientation ?? -1) {
+  switch (tempImage?.exif.exifIfd.orientation ?? -1) {
     case 3:
-      return image.copyRotate(tempImage!, 180);
+      return image.copyRotate(tempImage!, angle: 180);
     case 6:
-      return image.copyRotate(tempImage!, 90);
+      return image.copyRotate(tempImage!, angle: 90);
     case 8:
-      return image.copyRotate(tempImage!, -90);
+      return image.copyRotate(tempImage!, angle: -90);
   }
   return tempImage!;
 }
