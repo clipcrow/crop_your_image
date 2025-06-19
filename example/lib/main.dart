@@ -56,11 +56,14 @@ class _CropSampleState extends State<CropSample> {
     _cropController.image = _imageDataList[_currentImage];
   }
 
-  var _isSumbnail = false;
+  var _isThumbnail = false;
   var _isCropping = false;
   var _isCircleUi = false;
   Uint8List? _croppedData;
   var _statusText = '';
+  var _isOverlayActive = true;
+  var _undoEnabled = false;
+  var _redoEnabled = false;
 
   @override
   void initState() {
@@ -100,13 +103,13 @@ class _CropSampleState extends State<CropSample> {
                   padding: const EdgeInsets.all(16),
                   child: Row(
                     children: [
-                      _buildSumbnail(_imageDataList[0]),
+                      _buildThumbnail(_imageDataList[0]),
                       const SizedBox(width: 16),
-                      _buildSumbnail(_imageDataList[1]),
+                      _buildThumbnail(_imageDataList[1]),
                       const SizedBox(width: 16),
-                      _buildSumbnail(_imageDataList[2]),
+                      _buildThumbnail(_imageDataList[2]),
                       const SizedBox(width: 16),
-                      _buildSumbnail(_imageDataList[3]),
+                      _buildThumbnail(_imageDataList[3]),
                     ],
                   ),
                 ),
@@ -117,13 +120,30 @@ class _CropSampleState extends State<CropSample> {
                     children: [
                       if (_imageDataList.isNotEmpty) ...[
                         Crop(
+                          willUpdateScale: (newScale) => newScale < 5,
                           controller: _cropController,
                           image: _imageDataList[_currentImage],
-                          onCropped: (croppedData) {
-                            setState(() {
-                              _croppedData = croppedData;
-                              _isCropping = false;
-                            });
+                          onCropped: (result) {
+                            switch (result) {
+                              case CropSuccess(:final croppedImage):
+                                _croppedData = croppedImage;
+                              case CropFailure(:final cause):
+                                showDialog(
+                                  context: context,
+                                  builder: (context) => AlertDialog(
+                                    title: Text('Error'),
+                                    content:
+                                        Text('Failed to crop image: ${cause}'),
+                                    actions: [
+                                      TextButton(
+                                          onPressed: () =>
+                                              Navigator.pop(context),
+                                          child: Text('OK')),
+                                    ],
+                                  ),
+                                );
+                            }
+                            setState(() => _isCropping = false);
                           },
                           withCircleUi: _isCircleUi,
                           onStatusChanged: (status) => setState(() {
@@ -137,21 +157,38 @@ class _CropSampleState extends State<CropSample> {
                                 }[status] ??
                                 '';
                           }),
-                          initialSize: 0.5,
-                          maskColor: _isSumbnail ? Colors.white : null,
+                          maskColor: _isThumbnail ? Colors.white : null,
                           cornerDotBuilder: (size, edgeAlignment) =>
                               const SizedBox.shrink(),
                           interactive: true,
-                          fixArea: true,
+                          fixCropRect: true,
                           radius: 20,
-                          initialAreaBuilder: (rect) {
-                            return Rect.fromLTRB(
-                              rect.left + 24,
-                              rect.top + 24,
-                              rect.right - 24,
-                              rect.bottom - 24,
-                            );
-                          },
+                          initialRectBuilder: InitialRectBuilder.withBuilder(
+                            (viewportRect, imageRect) {
+                              return Rect.fromLTRB(
+                                viewportRect.left + 24,
+                                viewportRect.top + 24,
+                                viewportRect.right - 24,
+                                viewportRect.bottom - 24,
+                              );
+                            },
+                          ),
+                          onHistoryChanged: (history) => setState(() {
+                            _undoEnabled = history.undoCount > 0;
+                            _redoEnabled = history.redoCount > 0;
+                          }),
+                          overlayBuilder: _isOverlayActive
+                              ? (context, rect) {
+                                  final overlay = CustomPaint(
+                                    painter: GridPainter(),
+                                  );
+                                  return _isCircleUi
+                                      ? ClipOval(
+                                          child: overlay,
+                                        )
+                                      : overlay;
+                                }
+                              : null,
                         ),
                         IgnorePointer(
                           child: Padding(
@@ -170,11 +207,12 @@ class _CropSampleState extends State<CropSample> {
                         right: 16,
                         bottom: 16,
                         child: GestureDetector(
-                          onTapDown: (_) => setState(() => _isSumbnail = true),
-                          onTapUp: (_) => setState(() => _isSumbnail = false),
+                          onTapDown: (_) => setState(() => _isThumbnail = true),
+                          onTapUp: (_) => setState(() => _isThumbnail = false),
                           child: CircleAvatar(
-                            backgroundColor:
-                                _isSumbnail ? Colors.blue.shade50 : Colors.blue,
+                            backgroundColor: _isThumbnail
+                                ? Colors.blue.shade50
+                                : Colors.blue,
                             child: Center(
                               child: Icon(Icons.crop_free_rounded),
                             ),
@@ -236,6 +274,39 @@ class _CropSampleState extends State<CropSample> {
                               }),
                         ],
                       ),
+                      Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text('Show Grid'),
+                          Switch(
+                            value: _isOverlayActive,
+                            onChanged: (value) {
+                              setState(() {
+                                _isOverlayActive = value;
+                              });
+                            },
+                          )
+                        ],
+                      ),
+                      const SizedBox(height: 16),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          ElevatedButton(
+                            onPressed: _undoEnabled
+                                ? () => _cropController.undo()
+                                : null,
+                            child: Text('UNDO'),
+                          ),
+                          const SizedBox(width: 16),
+                          ElevatedButton(
+                            onPressed: _redoEnabled
+                                ? () => _cropController.redo()
+                                : null,
+                            child: Text('REDO'),
+                          ),
+                        ],
+                      ),
                       const SizedBox(height: 16),
                       Container(
                         width: double.infinity,
@@ -254,7 +325,6 @@ class _CropSampleState extends State<CropSample> {
                           ),
                         ),
                       ),
-                      const SizedBox(height: 40),
                     ],
                   ),
                 ),
@@ -269,7 +339,7 @@ class _CropSampleState extends State<CropSample> {
     );
   }
 
-  Expanded _buildSumbnail(Uint8List data) {
+  Expanded _buildThumbnail(Uint8List data) {
     final index = _imageDataList.indexOf(data);
     return Expanded(
       child: InkWell(
@@ -295,4 +365,37 @@ class _CropSampleState extends State<CropSample> {
       ),
     );
   }
+}
+
+class GridPainter extends CustomPainter {
+  final divisions = 2;
+  final strokeWidth = 1.0;
+  final Color color = Colors.black54;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..strokeWidth = strokeWidth
+      ..color = color;
+
+    final spacing = size / (divisions + 1);
+    for (var i = 1; i < divisions + 1; i++) {
+      // draw vertical line
+      canvas.drawLine(
+        Offset(spacing.width * i, 0),
+        Offset(spacing.width * i, size.height),
+        paint,
+      );
+
+      // draw horizontal line
+      canvas.drawLine(
+        Offset(0, spacing.height * i),
+        Offset(size.width, spacing.height * i),
+        paint,
+      );
+    }
+  }
+
+  @override
+  bool shouldRepaint(GridPainter oldDelegate) => false;
 }

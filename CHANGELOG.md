@@ -1,3 +1,64 @@
+## [2.0.0] - 2024.12.13
+### Breaking Changes
+This major update includes some breaking changes. See [migration guide](https://github.com/chooyan-eng/crop_your_image/issues/176) for more details.
+
+### Interface Enhancements
+* Change the argument type exposed by `onCropped` callback into `CropResult` from `Uint8List`. This allows to handle errors as well as cropped image data. Thank you [@justprodev](https://github.com/justprodev) for your idea at [#145](https://github.com/chooyan-eng/crop_your_image/issues/145)!
+* Change how to implement `ImageCropper` to make it more flexibly customizable.
+* `onMoved` callback passes additional `imageRect` parameter.
+* Errors are now implementing `Exception` instead of `Error`.
+* Change the type of `initialRectBuilder` to `InitialRectBuilder`, and now legacy `initialArea` and `initialSize` are removed and merged into `InitialRectBuilder` to avoid confusion.
+
+### New Features
+* Add undo / redo related features. See [README.md](README.md) for more details.
+* Respect original image format and output with the same format. Thank you [@komakur](https://github.com/komakur) for your idea and sample code at [#48](https://github.com/chooyan-eng/crop_your_image/issues/48)!
+* Add `filterQuality` argument to `Crop` widget. Thank you [@abichinger](https://github.com/abichinger) for your discussion and contribution at [#108](https://github.com/chooyan-eng/crop_your_image/pull/108)!
+* Add `onImageMoved` callback that notifies image moved when `interactive` is enabled. Thank you [@yujune](https://github.com/yujune) and [@eidolonFIRE](https://github.com/eidolonFIRE) for your contribution at [#159](https://github.com/chooyan-eng/crop_your_image/pull/159)! and [#92](https://github.com/chooyan-eng/crop_your_image/pull/92)!
+* Add `overlayBuilder` argument to `Crop` widget that enables to configure overlay on cropping area. Thank you [@abichinger](https://github.com/abichinger) for your contribution at [#107](https://github.com/chooyan-eng/crop_your_image/pull/107)!
+
+### Bug Fixes
+* Fix a bug of circle crop not working with JPEG images.
+* Fix a bug of `InvalidRectError` happening unexpectedly. Thank you [@feimenggo](https://github.com/feimenggo) and [@Lenkomotive](https://github.com/Lenkomotive) for your fixes at [#163](https://github.com/chooyan-eng/crop_your_image/pull/163)! and [#153](https://github.com/chooyan-eng/crop_your_image/pull/153)!
+* Fix a bug of using unmounted context.
+* Fix a bug of crashing after disposing `Crop` widget.
+
+Big appreciation to all the contributors joining discussions and sending PRs!
+
+## [1.1.0] - 2024.5.29
+* apply changes of latest version of `image` package
+
+## [1.0.2] - 2024.2.26
+* fix bug of causing `InvalidRectError` unexpectedly
+
+## [1.0.1] - 2024.2.11
+* fix bug of `withCircleUi` not working
+
+## [1.0.0] - 2024.2.11
+* `crop_your_image` is now stable!
+* well architectured and tested
+* works also on Web / Desktop 
+* backend logic is also interchangeable
+* some breaking changes. see [migration guide](https://github.com/chooyan-eng/crop_your_image/issues/133).
+
+## [1.0.0-dev.4] - 2024.2.10
+* `interactive` is now available for macOS! 
+* fix a tiny bug
+
+## [1.0.0-dev.3] - 2024.2.10
+* Rename some arguments of `Crop` and setter of `CropController`. See [migration guide](https://github.com/chooyan-eng/crop_your_image/issues/133).
+* `interactive` is now available for Web!
+
+## [1.0.0-dev.2] - 2024.2.9
+* Add test codes and fix some bugs.
+* Update README.md
+* Add `clipBehavior`.
+* Rename `allowScale` to `willUpdateScale`.
+
+## [1.0.0-dev.1] - 2024.2.8
+* Refactor and update the architecture of the entire codebase.
+* Add injecting backend logic features.
+* Add `allowScale` flag.
+
 ## [0.7.5] - 2023.6.5
 * Update Fluter version to 3.10.3
 
